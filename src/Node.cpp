@@ -7,15 +7,14 @@
 Node::Node()
 {
 	next_ = prev_ = this; //Sets up first node to create circular linked list
-	data = new Entry();
+	data = new Entry();//Create blank entry
 	children_ = NULL; //Node start with no children
 }
 
 /*
 * Constructs Node with given points and color
-* @param v1 Top left vertex of rectangle
-* @param v2 Bottom right vertex of rectangle
-* @param c Color the rectangle should be drawn
+* @param entry Entry data to put into node
+* 
 */
 Node::Node(Entry* entry){
 	next_ = prev_ = this; //Sets up first node to create circular linked list
@@ -41,9 +40,6 @@ void Node::insertAfter(Node* posNode, Node* insNode)
 
 /*
 * Adds a child to a node
-* @param v1 Top left vertex of child rectangle
-* @param v2 Bottom right vertex of child rectangle
-* @param c Color to draw child
 */
 void Node::addChild()
 {

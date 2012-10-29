@@ -3,7 +3,7 @@
 
 weberjtStarbucks::weberjtStarbucks(){
 	root = new Node();
-	divs = 50;
+	divs = 50;//Number of parent nodes
 }
 void weberjtStarbucks::build(Entry* c, int n)
 {
@@ -23,7 +23,8 @@ void weberjtStarbucks::build(Entry* c, int n)
 
 		if(cur->children_ == NULL){
 			cur->addChild();//If the parent has no children, create one
-			cur->children_->data->identifier = c[i].identifier;//Fill child data
+			//Fill child data
+			cur->children_->data->identifier = c[i].identifier;
 			cur->children_->data->x = c[i].x;
 			cur->children_->data->y = c[i].y;
 			cur = cur->next_;
@@ -36,8 +37,10 @@ void weberjtStarbucks::build(Entry* c, int n)
 			if((abs(c[i].x - cur->data->x) <= 0.00001) && (abs(c[i].y - cur->data->y) < 0.00001) && (cur != cur->next_)){
 				break;
 			}
+			//If cur is the last node in the child list
 			if(cur == stop->prev_){
-				root->insertAfter(cur, new Node());
+				root->insertAfter(cur, new Node());//insert new node
+				//Fill node with data
 				cur->next_->data->identifier = c[i].identifier;
 				cur->next_->data->x = c[i].x;
 				cur->next_->data->y = c[i].y;
@@ -48,24 +51,27 @@ void weberjtStarbucks::build(Entry* c, int n)
 }
 Entry* weberjtStarbucks::getNearest(double x, double y)
 {
-	Node* cur = root;
-	double temp;
-	double nearest = 100.0;
+	Node* cur = root; //Node for traversal
+	double temp;//Placeholder for distance equation
+	double nearest = 100.0;//Nearest initially set to absurdly large distance
 	Entry* result;
+
+	//Loop to correct parent node
 	for(int i = 0; i < (int)(x*divs);i++){
 		cur= cur->next_;
 	}
-	cur = cur->children_;
+	cur = cur->children_;//Enter child list from parent node
 	Node* stop = cur;
 	result = cur->data;
 	do{
 		temp = ((x-cur->data->x)*(x-cur->data->x)) + ((y-cur->data->y)*(y-cur->data->y));
+		//If cur's data location is closer to x an y than the previous closest entry
 		if(sqrt(temp) < nearest){
 			result = cur->data;
 			nearest = sqrt(temp);
 		}
 		cur = cur->next_;
-	}while(cur != stop);
+	}while(cur != stop);//Stop when cur gets back to beginning of list
 	return result;
 }
 

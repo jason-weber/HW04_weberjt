@@ -8,8 +8,8 @@ class weberjtStarbucks : public Starbucks {
 		weberjtStarbucks();
 		virtual void weberjtStarbucks::build(Entry* c, int n);
 		virtual Entry* weberjtStarbucks::getNearest(double x, double y);
-		Node* root;
-		int divs;
+		Node* root;//Start node, root/sentinel same thing
+		int divs;//Number of parent nodes/divisions of the data
 
 
 };
