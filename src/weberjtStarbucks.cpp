@@ -15,7 +15,7 @@ void weberjtStarbucks::build(Entry* c, int n)
 
 	for(int i = 0; i < n; i++){
 		cur = root; //Reset cur to root at the beginning for each item in c
-		int level = (int)(c[i].x*divs); //Find which parent to select
+		int level = (int)ceil((c[i].x * divs)); //Find which parent to select
 
 		for(int j = 0; j < level; j++){//Move to that parent
 			cur = cur->next_;
@@ -44,6 +44,7 @@ void weberjtStarbucks::build(Entry* c, int n)
 				cur->next_->data->identifier = c[i].identifier;
 				cur->next_->data->x = c[i].x;
 				cur->next_->data->y = c[i].y;
+				cur = cur->next_;
 			}
 			cur = cur->next_;
 		}while(cur != stop);//Stop once first child node is reached again
@@ -57,7 +58,7 @@ Entry* weberjtStarbucks::getNearest(double x, double y)
 	Entry* result;
 
 	//Loop to correct parent node
-	for(int i = 0; i < (int)(x*divs);i++){
+	for(int i = 0; i < (int)ceil(x * divs);i++){
 		cur= cur->next_;
 	}
 	cur = cur->children_;//Enter child list from parent node

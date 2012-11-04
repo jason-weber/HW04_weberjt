@@ -1,4 +1,8 @@
 #include "Starbucks.h"
+#include "cinder/gl/gl.h"
+#include "cinder/Rand.h"
+
+
 
 class Node{
 
@@ -7,6 +11,7 @@ class Node{
 		Node* prev_; //previous node in linked list
 		Node* children_;//children head node of children linked list
 		Entry* data;
+		ci::Color8u color;
 
 		
 		//Constructors
@@ -16,7 +21,7 @@ class Node{
 
 		void insertAfter(Node* posNode, Node* insNode); //insert node after given node
 		void addChild();//adds child to node
-
+		void draw();
 		
 
 
