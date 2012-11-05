@@ -57,5 +57,5 @@ void Node::draw(){
 	double x = this->data->x*700 + 50;
 	double y = (1-this->data->y)*525 + 50;
 	gl::color(color);
-	gl::drawSolidCircle(Vec2f(x,y), 5.0);
+	gl::drawSolidCircle(Vec2f(x,y), 4.0);
 }
