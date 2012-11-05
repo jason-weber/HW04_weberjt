@@ -12,6 +12,10 @@ class Node{
 		Node* children_;//children head node of children linked list
 		Entry* data;
 		ci::Color8u color;
+		double stretchX;
+		double stretchY;
+		double offsetX;
+		double offsetY;
 
 		
 		//Constructors

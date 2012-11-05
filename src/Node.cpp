@@ -10,6 +10,10 @@ Node::Node()
 	data = new Entry();//Create blank entry
 	children_ = NULL; //Node start with no children
 	color = Color(Rand::randFloat(), Rand::randFloat(), Rand::randFloat());
+	stretchX = 700;
+	stretchY = 525;
+	offsetX = 50;
+	offsetY = 50;
 }
 
 /*
@@ -54,8 +58,8 @@ void Node::addChild()
 }
 
 void Node::draw(){
-	double x = this->data->x*700 + 50;
-	double y = (1-this->data->y)*525 + 50;
+	double x = this->data->x * stretchX + offsetX;
+	double y = (1-this->data->y) * stretchY + offsetY;
 	gl::color(color);
 	gl::drawSolidCircle(Vec2f(x,y), 4.0);
 }

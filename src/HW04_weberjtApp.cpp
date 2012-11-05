@@ -106,9 +106,10 @@ void HW04_weberjtApp::setup()
 
 void HW04_weberjtApp::mouseDown( MouseEvent event )
 {
+	// Highlight in white, the nearest Starbucks from the mouse position - left click
 	if(event.isLeftDown()){
-		double x = abs((event.getX() - 50)/700.0);
-		double y = abs(1 - ((event.getY()-50)/525.0));
+		double x = abs((event.getX() - 50) / 700.0);
+		double y = abs(1 - ((event.getY() - 50) / 525.0));
 		nearest = var->getNearest(x,y);
 
 		result->color = Color(Rand::randFloat(), Rand::randFloat(), Rand::randFloat());
@@ -116,8 +117,58 @@ void HW04_weberjtApp::mouseDown( MouseEvent event )
 
 		result->color = Color(1.0,1.0,1.0);
 	}
+	//Zoom map on mouse position - right click
+	//Does not work 100% but will zoom in fairly well for first few clicks
 	if(event.isRightDown()){
-		colorMap = true;
+		Node* pcur = var->root;//Parent iterator node
+		Node* ccur = pcur->children_;//Child iterator node
+		for(int i = 0; i < var->divs; i++){
+			do{
+				if(ccur != NULL){
+					ccur->stretchX *= 1.3;
+					ccur->stretchY *= 1.3;
+					if(event.getX() > kAppWidth/2){
+						ccur->offsetX -= event.getX() / 1.3;
+					}
+					else{
+						ccur->offsetX *= 1.3;
+					}
+					if(event.getY() > kAppHeight/2){
+						ccur->offsetY -= event.getY() / 1.3;
+					}
+					else{
+						ccur->offsetY *= 1.3;
+					}
+					ccur = ccur->next_;
+				}
+				else{
+					break;
+				}
+			}while(ccur != pcur->children_);
+		pcur = pcur->next_;
+		ccur = pcur->children_;
+		}
+	}
+	//Reset map after zoom - Hold shift and right click
+	if(event.isShiftDown() && event.isRightDown()){
+		Node* pcur = var->root;//Parent iterator node
+		Node* ccur = pcur->children_;//Child iterator node
+		for(int i = 0; i < var->divs; i++){
+			do{
+				if(ccur != NULL){
+					ccur->stretchX = 700;
+					ccur->stretchY = 525;
+					ccur->offsetX = 50;
+					ccur->offsetY = 50;
+					ccur = ccur->next_;
+				}
+				else{
+					break;
+				}
+			}while(ccur != pcur->children_);
+		pcur = pcur->next_;
+		ccur = pcur->children_;
+		}
 	}
 }
 
@@ -131,17 +182,6 @@ void HW04_weberjtApp::draw()
 	gl::color(Color8u(200,200,200));
 	gl::drawSolidRect(Rectf(20,20,kAppWidth-20,kAppHeight-20));
 
-
-	if(colorMap){
-		for(int i = 51; i < kAppHeight; i += 2){
-			for(int j = 51; j < kAppWidth; j += 2){
-				nearest = var->getNearest(j,i);
-				Node* result = nodeFromEntry();
-				gl::color(result->color);
-				gl::drawSolidRect(Rectf(j, i, j + 1,i + 1));
-			}
-		}
-	}
 	//var->root->children_->draw();
 	Node* pcur = var->root;//Parent iterator node
 	Node* ccur = pcur->children_;//Child iterator node
