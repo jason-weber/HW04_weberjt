@@ -69,6 +69,9 @@ Entry* weberjtStarbucks::getNearest(double x, double y)
 		cur = pcur->children_;
 		stop = cur;
 		do{
+			if(cur == NULL){
+				break;
+			}
 			temp = ((x-cur->data->x)*(x-cur->data->x)) + ((y-cur->data->y)*(y-cur->data->y));
 			//If cur's data location is closer to x an y than the previous closest entry
 			if(sqrt(temp) < nearest){

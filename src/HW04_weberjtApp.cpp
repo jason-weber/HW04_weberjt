@@ -13,14 +13,16 @@ using namespace std;
 
 class HW04_weberjtApp : public AppBasic {
   public:
-	Font* font;
-	weberjtStarbucks* var;
-	Entry* nearest;
-	static const int kAppWidth = 800;
+	Font* font; //Font in case drawing strings needed to be done
+	weberjtStarbucks* var; //Main starBucks pointer
+	Entry* nearest; //Last nearest Entry returned from getNearest
+	double* census2000; //Array for Census_2006.csv data
+	int cenCount; //Length of census2000
+	static const int kAppWidth = 800; 
 	static const int kAppHeight = 600;
-	bool colorMap;
-	Node* result;
-	Node* nodeFromEntry();
+	bool drawStarbucks;//Draw Starbucks_2006.csv data if true, Census_2000.csv if false
+	Node* result; //Node of nearest
+	Node* nodeFromEntry(); //Finds node of nearest 
 	void setup();
 	void mouseDown( MouseEvent event );	
 	void update();
@@ -28,7 +30,10 @@ class HW04_weberjtApp : public AppBasic {
 	void prepareSettings(Settings* settings);
 	void keyDown(KeyEvent event);
 };
-
+/*
+* Finds node of the nearest Entry pointer
+* @return The nearest's node
+*/
 Node* HW04_weberjtApp::nodeFromEntry(){
 	Node* temp = var->root;
 	Node* result = temp->children_;
@@ -66,7 +71,7 @@ void HW04_weberjtApp::setup()
 	string x; //String that will be cast to double for x value of location
 	string y; //String that will be cast to double for y value of location
 	string description; //String to hold description of entry
-	colorMap = false;
+	drawStarbucks = true;
 	while(file.good()){//While stream gives no errors
 		//Count how many items in list
 		std::getline(file,str,'\r');
@@ -102,6 +107,48 @@ void HW04_weberjtApp::setup()
 	//Build method
 	var->build(c, count);	
 	result = var->root->children_;
+
+	//New stream to read in file2
+	ifstream file2("Census_2000.csv");
+	count = 0;
+	while(file2.good()){
+		std::getline(file2,str,'\r');
+		count++;
+	}
+	file2.close();
+	census2000 = new double[count * 3];//Allows population, latitude, and longitude to fit into one array
+	count = 0;
+	file2.open("Census_2000.csv");
+	while(file2.good()){
+		std::getline(file2,str,'\r');
+
+		int index = str.find(',');
+		//skips first 3 entries in csv file
+		index = str.find(',', index +1);
+		index = str.find(',', index +1);
+		index = str.find(',', index +1);
+		//assign parts of str to string variables
+		//using description variable to actually hold population data for this file as it has no descriptions
+		description = str.substr(index + 1, str.find(',', index));
+		description = description.substr(0,description.find(','));
+		index = str.find(',', index + 1);
+		x = str.substr(index + 1, str.find(',', index));
+		x = x.substr(0, x.find(','));
+		index = str.find(',', index + 1);
+		y = str.substr(index + 1, str.find(',', index));
+		//convert strings to doubles
+		double pop = strtod(description.c_str(), NULL);
+		double xVal = strtod(x.c_str(), NULL);
+		double yVal = strtod(y.c_str(),NULL);
+
+		census2000[count] = pop;
+		census2000[count + 1] = (yVal - 24)/(49-24);
+		census2000[count + 2] = (xVal + 125)/((-63) - (-125));
+		count = count + 3;
+	}
+	cenCount = count;
+
+
 }
 
 void HW04_weberjtApp::mouseDown( MouseEvent event )
@@ -116,6 +163,9 @@ void HW04_weberjtApp::mouseDown( MouseEvent event )
 		result = nodeFromEntry();
 
 		result->color = Color(1.0,1.0,1.0);
+	}
+	if(event.isShiftDown() && event.isLeftDown()){
+		drawStarbucks = !drawStarbucks;
 	}
 	//Zoom map on mouse position - right click
 	//Does not work 100% but will zoom in fairly well for first few clicks
@@ -182,23 +232,35 @@ void HW04_weberjtApp::draw()
 	gl::color(Color8u(200,200,200));
 	gl::drawSolidRect(Rectf(20,20,kAppWidth-20,kAppHeight-20));
 
-	//var->root->children_->draw();
-	Node* pcur = var->root;//Parent iterator node
-	Node* ccur = pcur->children_;//Child iterator node
-	for(int i = 0; i < var->divs; i++){
-		do{
-			if(ccur != NULL){
-				ccur->draw();
-				ccur = ccur->next_;
-			}
-			else{
-				break;
-			}
-		}while(ccur != pcur->children_);
-		pcur = pcur->next_;
-		ccur = pcur->children_;
+	//draws initial Starbucks_2006.csv infor
+	if(drawStarbucks){
+		//var->root->children_->draw();
+		Node* pcur = var->root;//Parent iterator node
+		Node* ccur = pcur->children_;//Child iterator node
+		for(int i = 0; i < var->divs; i++){
+			do{
+				if(ccur != NULL){
+					ccur->draw();
+					ccur = ccur->next_;
+				}
+				else{
+					break;
+				}
+			}while(ccur != pcur->children_);
+			pcur = pcur->next_;
+			ccur = pcur->children_;
+		}
+		result->draw();
 	}
-	result->draw();
+	// Should draw Census_2000.csv data but I did not understand the latitude/longitude conversion to x and y, so this does not draw a legible map
+	else{ 
+		for(int i = 0; i < cenCount * 3; i = i + 3){
+			double x = census2000[i + 1];
+			double y = census2000[i + 2];
+			gl::color(Color(1.0,0.0,0.0));
+			gl::drawSolidCircle(Vec2f(x,y), 4.0);
+		}
+	}
 }
 
 CINDER_APP_BASIC( HW04_weberjtApp, RendererGl )
