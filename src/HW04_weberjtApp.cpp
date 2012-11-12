@@ -11,12 +11,16 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
+//This app could not read in the census data, I kept having problems displaying it correctly and 
+//was receiving a lot of errors
+//It satisfies A,B, a portion of C and D
 class HW04_weberjtApp : public AppBasic {
   public:
 	Font* font; //Font in case drawing strings needed to be done
 	weberjtStarbucks* var; //Main starBucks pointer
+	weberjtStarbucks* cenvar;
 	Entry* nearest; //Last nearest Entry returned from getNearest
-	double* census2000; //Array for Census_2006.csv data
+	Entry* census2000; //Array for Census_2006.csv data
 	int cenCount; //Length of census2000
 	static const int kAppWidth = 800; 
 	static const int kAppHeight = 600;
@@ -64,6 +68,7 @@ void HW04_weberjtApp::prepareSettings(Settings* settings){
 void HW04_weberjtApp::setup()
 {
 	var = new weberjtStarbucks();//My Starbucks object
+	cenvar = new weberjtStarbucks();
 	font = new Font("Ariel",30);
 	ifstream file("Starbucks_2006.csv"); //Stream to read from csv
 	int count = 0; //Counter for length of array and indexing
@@ -108,7 +113,9 @@ void HW04_weberjtApp::setup()
 	var->build(c, count);	
 	result = var->root->children_;
 
-	//New stream to read in file2
+	//New stream to read in Census+200.csv
+	//Commented out as it takes a long time and was not drawing to the window correctly
+	/*
 	ifstream file2("Census_2000.csv");
 	count = 0;
 	while(file2.good()){
@@ -116,7 +123,7 @@ void HW04_weberjtApp::setup()
 		count++;
 	}
 	file2.close();
-	census2000 = new double[count * 3];//Allows population, latitude, and longitude to fit into one array
+	census2000 = new Entry[count];//Allows population, latitude, and longitude to fit into one array
 	count = 0;
 	file2.open("Census_2000.csv");
 	while(file2.good()){
@@ -141,12 +148,14 @@ void HW04_weberjtApp::setup()
 		double xVal = strtod(x.c_str(), NULL);
 		double yVal = strtod(y.c_str(),NULL);
 
-		census2000[count] = pop;
-		census2000[count + 1] = (yVal - 24)/(49-24);
-		census2000[count + 2] = (xVal + 125)/((-63) - (-125));
-		count = count + 3;
+		census2000[count].identifier = description;
+		census2000[count].x = (yVal - 24)/(49-24);
+		census2000[count].y = 1 - ((xVal - (-125))/((-63) - (-125)));
+		count++;
 	}
 	cenCount = count;
+	cenvar->build(census2000,count);
+	*/
 
 
 }
@@ -165,7 +174,7 @@ void HW04_weberjtApp::mouseDown( MouseEvent event )
 		result->color = Color(1.0,1.0,1.0);
 	}
 	if(event.isShiftDown() && event.isLeftDown()){
-		drawStarbucks = !drawStarbucks;
+		
 	}
 	//Zoom map on mouse position - right click
 	//Does not work 100% but will zoom in fairly well for first few clicks
@@ -253,14 +262,26 @@ void HW04_weberjtApp::draw()
 		result->draw();
 	}
 	// Should draw Census_2000.csv data but I did not understand the latitude/longitude conversion to x and y, so this does not draw a legible map
+	/*
 	else{ 
-		for(int i = 0; i < cenCount * 3; i = i + 3){
-			double x = census2000[i + 1];
-			double y = census2000[i + 2];
-			gl::color(Color(1.0,0.0,0.0));
-			gl::drawSolidCircle(Vec2f(x,y), 4.0);
+		Node* pcur = cenvar->root;//Parent iterator node
+		Node* ccur = pcur->children_;//Child iterator node
+		for(int i = 0; i < cenvar->divs; i++){
+			do{
+				if(ccur != NULL){
+					ccur->draw();
+					ccur = ccur->next_;
+				}
+				else{
+					break;
+				}
+			}while(ccur != pcur->children_);
+			pcur = pcur->next_;
+			ccur = pcur->children_;
 		}
 	}
+	*/
+	gl::drawString(result->data->identifier, Vec2f(0.0,0.0),Color(1.0,1.0,1.0),*font);
 }
 
 CINDER_APP_BASIC( HW04_weberjtApp, RendererGl )

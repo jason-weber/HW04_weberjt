@@ -1,6 +1,8 @@
 #include "weberjtStarbucks.h"
 
 
+
+
 weberjtStarbucks::weberjtStarbucks(){
 	root = new Node();
 	divs = 25;//Number of parent nodes
@@ -24,6 +26,7 @@ void weberjtStarbucks::build(Entry* c, int n)
 		if(cur->children_ == NULL){
 			cur->addChild();//If the parent has no children, create one
 			//Fill child data
+			cur->children_->n = i%2;//change to 0 to draw all circles, 1 for rectangles
 			cur->children_->data->identifier = c[i].identifier;
 			cur->children_->data->x = c[i].x;
 			cur->children_->data->y = c[i].y;
@@ -40,6 +43,7 @@ void weberjtStarbucks::build(Entry* c, int n)
 			//If cur is the last node in the child list
 			if(cur == stop->prev_){
 				root->insertAfter(cur, new Node());//insert new node
+				cur->next_->n = i%2;//change to 0 to draw all circles, 1 for rectangles
 				//Fill node with data
 				cur->next_->data->identifier = c[i].identifier;
 				cur->next_->data->x = c[i].x;

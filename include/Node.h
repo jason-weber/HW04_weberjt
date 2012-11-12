@@ -16,6 +16,7 @@ class Node{
 		double stretchY;
 		double offsetX;
 		double offsetY;
+		int n;
 
 		
 		//Constructors

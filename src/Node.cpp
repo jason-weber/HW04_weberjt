@@ -61,5 +61,10 @@ void Node::draw(){
 	double x = this->data->x * stretchX + offsetX;
 	double y = (1-this->data->y) * stretchY + offsetY;
 	gl::color(color);
-	gl::drawSolidCircle(Vec2f(x,y), 4.0);
+	if(n == 0){
+		gl::drawSolidCircle(Vec2f(x,y), 4.0);
+	}
+	else{
+		gl::drawSolidRect(Rectf(x,y,x+8,y+8));
+	}
 }
